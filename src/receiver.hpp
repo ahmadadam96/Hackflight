@@ -24,6 +24,7 @@
 #include <math.h>
 
 #include "datatypes.hpp"
+#include "loggingfunctions.hpp"
 
 namespace hf {
 
@@ -147,6 +148,7 @@ namespace hf {
                 // Wait till there's a new frame
                 if (!gotNewFrame()) return false;
 
+                printTaskTime("receiver task", true);
                 // Read raw channel values
                 readRawvals();
 

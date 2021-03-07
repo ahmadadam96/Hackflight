@@ -178,7 +178,6 @@ namespace hf {
                 // Check whether receiver data is available
                 if (!_receiver->getDemands(_state.rotation[AXIS_YAW] - _yawInitial)) return;
 
-                printTaskTime("receiver task", true);
                 // Disarm
                 if (_state.armed && !_receiver->getAux1State()) {
                     _state.armed = false;
