@@ -25,6 +25,7 @@
 #include "mspparser.hpp"
 #include "debugger.hpp"
 #include "mixer.hpp"
+#include "loggingfunctions.hpp"
 
 namespace hf {
 
@@ -56,6 +57,7 @@ namespace hf {
 
             virtual void doTask(void) override
             {
+                printTaskTime("serial task", true);
                 while (_board->serialAvailableBytes() > 0) {
 
                     MspParser::parse(_board->serialReadByte());
@@ -69,6 +71,7 @@ namespace hf {
                 if (!_state->armed) {
                     _mixer->runDisarmed();
                 }
+                printTaskTime("serial task", false);
             }
 
             // MspParser overrides -------------------------------------------------------

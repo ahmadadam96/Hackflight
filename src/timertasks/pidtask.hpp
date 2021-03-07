@@ -21,6 +21,7 @@
 #pragma once
 
 #include "timertask.hpp"
+#include "loggingfunctions.hpp"
 
 namespace hf {
 
@@ -69,6 +70,7 @@ namespace hf {
 
             virtual void doTask(void) override
             {
+                printTaskTime("PID task", true);
                 // Start with demands from receiver, scaling roll/pitch/yaw by constant
                 demands_t demands = {};
                 demands.throttle = _receiver->demands.throttle;
@@ -108,6 +110,7 @@ namespace hf {
                 if (_state->armed && !_state->failsafe && !_receiver->throttleIsDown()) {
                     _mixer->run(demands);
                 }
+                printTaskTime("PID task", false);
              }
 
     };  // PidTask

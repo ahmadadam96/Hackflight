@@ -34,6 +34,7 @@
 #include "timertasks/serialtask.hpp"
 #include "sensors/surfacemount/gyrometer.hpp"
 #include "sensors/surfacemount/quaternion.hpp"
+#include "loggingfunctions.hpp"
 
 namespace hf {
 
@@ -83,8 +84,10 @@ namespace hf {
                 // If quaternion data ready
                 if (_quaternion.ready(time)) {
 
+                    printTaskTime("quaternion sensor task", true);
                     // Update state with new quaternion to yield Euler angles
                     _quaternion.modifyState(_state, time);
+                    printTaskTime("quaternion sensor task", false);
                 }
             }
 
@@ -96,8 +99,10 @@ namespace hf {
                 // If gyrometer data ready
                 if (_gyrometer.ready(time)) {
 
+                    printTaskTime("gyrometer sensor task", true);
                     // Update state with gyro rates
                     _gyrometer.modifyState(_state, time);
+                    printTaskTime("gyrometer sensor task", false);
                 }
             }
 
@@ -114,7 +119,9 @@ namespace hf {
                     Sensor * sensor = _sensors[k];
                     float time = _board->getTime();
                     if (sensor->ready(time)) {
+                        printTaskTime("optional sensor number " + k + " task", true);
                         sensor->modifyState(_state, time);
+                        printTaskTime("optional sensor number " + k + " task", false);
                     }
                 }
             }
@@ -171,6 +178,7 @@ namespace hf {
                 // Check whether receiver data is available
                 if (!_receiver->getDemands(_state.rotation[AXIS_YAW] - _yawInitial)) return;
 
+                printTaskTime("receiver task", true);
                 // Disarm
                 if (_state.armed && !_receiver->getAux1State()) {
                     _state.armed = false;
@@ -196,6 +204,7 @@ namespace hf {
                 // Set LED based on arming status
                 _board->showArmedStatus(_state.armed);
 
+                printTaskTime("receiver task", false);
             } // checkReceiver
 
         public:
