@@ -119,9 +119,10 @@ namespace hf {
                     Sensor * sensor = _sensors[k];
                     float time = _board->getTime();
                     if (sensor->ready(time)) {
-                        printTaskTime("optional sensor number " + k + " task", true);
+                        String sensor_number = "optional sensor number " + String(k, DEC) + " task"; 
+                        printTaskTime(sensor_number, true);
                         sensor->modifyState(_state, time);
-                        printTaskTime("optional sensor number " + k + " task", false);
+                        printTaskTime(sensor_number, false);
                     }
                 }
             }

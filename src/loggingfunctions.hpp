@@ -1,21 +1,20 @@
 #pragma once
 
-#include <string>
+#include "debugger.hpp"
+#include <String>
 
 namespace hf {
-    void printTaskTime(const std::string& task_name, bool task_start)
+    void printTaskTime(String task_name, bool task_start)
     {
-        Serial.print("Task ");
-        Serial.print(task_name);
+        Debugger::printf("Task ");
+        Debugger::printf("%s", task_name.c_str());
 
         if (task_start)
-            Serial.print(" has started at time ");
+            Debugger::printf(" has started at time ");
         else
-            Serial.print(" has terminated at time ");
+            Debugger::printf(" has terminated at time ");
 
-        Serial.print(micros());
-
-        Serial.print("\n");
+        Debugger::printf("%ld\n", micros());
         }
 }
 
