@@ -32,7 +32,7 @@ Copyright (c) 2018 Simon D. Levy
 
 #include "hackflight.hpp"
 #include "boards/realboards/arduino/ladybugfc.hpp"
-#include "receivers/arduino/sbus.hpp"
+#include "receivers/arduino/cppm.hpp"
 #include "mixers/quadxcf.hpp"
 #include "pidcontrollers/rate.hpp"
 #include "pidcontrollers/level.hpp"
@@ -42,7 +42,7 @@ static constexpr float DEMAND_SCALE = 4.0f;
 
 hf::Hackflight h;
 
-hf::SBUS_Receiver rc = hf::SBUS_Receiver(CHANNEL_MAP, DEMAND_SCALE);
+hf::CPPM_Receiver rc = hf::CPPM_Receiver(0, CHANNEL_MAP, DEMAND_SCALE);
 
 hf::MixerQuadXCF mixer;
 
