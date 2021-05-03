@@ -29,8 +29,8 @@ namespace hf {
 
         private:
 
-            static const uint16_t PPM_MIN = 990;
-            static const uint16_t PPM_MAX = 2020;
+            static const uint16_t PPM_MIN = 981;
+            static const uint16_t PPM_MAX = 2074;
 
             CPPMRX * rx = NULL;
 

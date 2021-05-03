@@ -37,8 +37,9 @@ Copyright (c) 2018 Simon D. Levy
 #include "pidcontrollers/rate.hpp"
 #include "pidcontrollers/level.hpp"
 
-static constexpr uint8_t CHANNEL_MAP[6] = {0, 1, 2, 3, 6, 4};
-static constexpr float DEMAND_SCALE = 4.0f;
+// throttle, roll, pitch, yaw, aux, arm 
+static constexpr uint8_t CHANNEL_MAP[6] = {2, 3, 1, 0, 4, 5};
+static constexpr float DEMAND_SCALE = 1.0f;
 
 hf::Hackflight h;
 
@@ -52,6 +53,7 @@ hf::LevelPid levelPid = hf::LevelPid(0.20f);
 
 void setup(void)
 {
+    delay(3000);
     // Initialize Hackflight firmware
     h.init(new hf::LadybugFC(), &hf::ladybugIMU, &rc, &mixer, &hf::ladybugFcNewMotors);
 
