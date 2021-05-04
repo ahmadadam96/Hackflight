@@ -22,6 +22,7 @@
 
 #include "filters.hpp"
 #include "motor.hpp"
+#include "datatypes.hpp"
 
 namespace hf {
 
@@ -29,6 +30,7 @@ namespace hf {
 
         friend class Hackflight;
         friend class SerialTask;
+        friend class Receiver;
 
         private:
 

@@ -42,8 +42,6 @@ namespace hf {
 
         private:
 
-            static constexpr float MAX_ARMING_ANGLE_DEGREES = 25.0f;
-
             // Supports periodic ad-hoc debugging
             Debugger _debugger;
 
@@ -51,11 +49,6 @@ namespace hf {
             Sensor * _sensors[256] = {NULL};
             uint8_t _sensor_count = 0;
 
-            // Safety
-            bool _safeToArm = false;
-
-            // Support for headless mode
-            float _yawInitial = 0;
 
             // Timer task for PID controllers
             PidTask _pidTask;
@@ -71,10 +64,7 @@ namespace hf {
             Gyrometer _gyrometer;
             Quaternion _quaternion; // not really a sensor, but we treat it like one!
  
-            bool safeAngle(uint8_t axis)
-            {
-                return fabs(_state.rotation[axis]) < Filter::deg2rad(MAX_ARMING_ANGLE_DEGREES);
-            }
+
 
            void checkQuaternion(void)
             {
@@ -146,6 +136,8 @@ namespace hf {
                 _receiver = receiver;
                 _mixer = mixer;
 
+                _receiver->init(board, &_state, mixer);
+
                 // Ad-hoc debugging support
                 _debugger.init(board);
 
@@ -164,48 +156,6 @@ namespace hf {
                 // Initialize timer task for PID controllers
                 _pidTask.init(_board, _receiver, _mixer, &_state);
             }
-
-            void checkReceiver(void)
-            {
-                // Sync failsafe to receiver
-                if (_receiver->lostSignal() && _state.armed) {
-                    _mixer->cut();
-                    _state.armed = false;
-                    _state.failsafe = true;
-                    _board->showArmedStatus(false);
-                    return;
-                }
-
-                // Check whether receiver data is available
-                if (!_receiver->getDemands(_state.rotation[AXIS_YAW] - _yawInitial)) return;
-
-                // Disarm
-                if (_state.armed && !_receiver->getAux1State()) {
-                    _state.armed = false;
-                } 
-
-                // Avoid arming if aux1 switch down on startup
-                if (!_safeToArm) {
-                    _safeToArm = !_receiver->getAux1State();
-                }
-
-                // Arm (after lots of safety checks!)
-                if (_safeToArm && !_state.armed && _receiver->throttleIsDown() && _receiver->getAux1State() && 
-                        !_state.failsafe && safeAngle(AXIS_ROLL) && safeAngle(AXIS_PITCH)) {
-                    _state.armed = true;
-                    _yawInitial = _state.rotation[AXIS_YAW]; // grab yaw for headless mode
-                }
-
-                // Cut motors on throttle-down
-                if (_state.armed && _receiver->throttleIsDown()) {
-                    _mixer->cut();
-                }
-
-                // Set LED based on arming status
-                _board->showArmedStatus(_state.armed);
-
-                printTaskTime("receiver task", false);
-            } // checkReceiver
 
         public:
 
@@ -248,8 +198,8 @@ namespace hf {
 
             void update(void)
             {
-                // Grab control signal if available
-                checkReceiver();
+                // Update receiver task
+                _receiver->update();
 
                 // Update PID controllers task
                 _pidTask.update();

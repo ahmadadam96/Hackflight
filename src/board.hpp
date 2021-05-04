@@ -32,6 +32,7 @@ namespace hf {
         friend class TimerTask;
         friend class SerialTask;
         friend class PidTask;
+        friend class Receiver;
 
         protected:
 

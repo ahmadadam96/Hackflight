@@ -113,6 +113,10 @@ namespace hf {
                 printTaskTime("PID task", false);
              }
 
+             virtual bool specific_conditions(void) override
+             {
+             }
+
     };  // PidTask
 
 } // namespace hf
