@@ -40,22 +40,22 @@ namespace hf
 
         task_info task_infos[number_of_tasks];
 
-        bool can_schedule_update(int update_period)
+        unsigned int when_schedule_update(unsigned int update_time_required)
         {
-            int min_value = INT_MAX;
-            int min_index;
-            for (int i = 0; i < number_of_tasks; i++) {
+            unsigned int min_value = UINT_MAX;
+            unsigned int min_index;
+            for (unsigned int i = 0; i < number_of_tasks; i++) {
                 if (task_infos[i].time_next_invocation < min_value) {
                     min_value = task_infos[i].time_next_invocation;
                     min_index = i;
                 }
             }
-            int current_time = micros();
+            unsigned int current_time = micros();
 
-            if (min_value - current_time < update_period)
-                return true;
+            if (min_value - current_time < update_time_required)
+                return micros();
             else
-                return false;
+                return 0;
         }
 
     };  // SerialTask
