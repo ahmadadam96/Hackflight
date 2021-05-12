@@ -170,8 +170,8 @@ namespace hf {
                 // Sync failsafe to receiver
                 if (_receiver->lostSignal() && _state.armed) {
                     _mixer->cut();
-                    Debugger::printf("Disarmed");
                     _state.armed = false;
+                    Debugger::printf("Disarmed\n");
                     _state.failsafe = true;
                     _board->showArmedStatus(false);
                     return;
@@ -182,8 +182,8 @@ namespace hf {
 
                 // Disarm
                 if (_state.armed && !_receiver->getAux1State()) {
-                    Debugger::printf("Disarmed");
                     _state.armed = false;
+                    Debugger::printf("Disarmed\n");
                 } 
 
                 // Avoid arming if aux1 switch down on startup
@@ -194,8 +194,8 @@ namespace hf {
                 // Arm (after lots of safety checks!)
                 if (_safeToArm && !_state.armed && _receiver->throttleIsDown() && _receiver->getAux1State() && 
                         !_state.failsafe && safeAngle(AXIS_ROLL) && safeAngle(AXIS_PITCH)) {
-                    Debugger::printf("Armed");
                     _state.armed = true;
+                    Debugger::printf("Armed\n");
                     _yawInitial = _state.rotation[AXIS_YAW]; // grab yaw for headless mode
                 }
 
