@@ -11,14 +11,11 @@ namespace hf {
 
     void print(const char * fmt, ...){
         va_start(ap, fmt);
-        char temp_buf[200];
-        vsnprintf(temp_buf, 200, fmt, ap);
         
-        for(int i=0; temp_buf[i] != '\0'; i++){
-            buf[index] = temp_buf[i];
-            index++;
-        }
-        buf[index] = '\0';
+        int size = vsnprintf(&buf[index], 200, fmt, ap);
+
+        index += size;
+        
         va_end(ap);
 
         if(index >= 29800){
@@ -33,9 +30,9 @@ namespace hf {
         print("%s", task_name.c_str());
 
         if (task_start)
-            print(" has started at time ");
+            print(" has started at time,");
         else
-            print(" has terminated at time ");
+            print(" has terminated at time,");
 
         print("%ld\n", micros());
     }
