@@ -36,6 +36,7 @@ Copyright (c) 2018 Simon D. Levy
 #include "mixers/quadxcf.hpp"
 #include "pidcontrollers/rate.hpp"
 #include "pidcontrollers/level.hpp"
+#include "debugger.hpp"
 
 // throttle, roll, pitch, yaw, aux, arm 
 static constexpr uint8_t CHANNEL_MAP[6] = {2, 3, 1, 0, 4, 5};
@@ -56,6 +57,8 @@ void setup(void)
     delay(3000);
     // Initialize Hackflight firmware
     h.init(new hf::LadybugFC(), &hf::ladybugIMU, &rc, &mixer, &hf::ladybugFcNewMotors);
+
+    hf::Debugger::printf("Started\n");
 
     // Add PID controllers
     h.addPidController(&levelPid);
