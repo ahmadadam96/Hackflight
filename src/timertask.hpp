@@ -29,8 +29,8 @@ namespace hf {
 
         private:
 
+            float _period = 0;
             float _time = 0;
-            bool _enabled = true;
 
         protected:
 
@@ -38,7 +38,7 @@ namespace hf {
 
             TimerTask(float freq)
             {
-                period = 1 / freq;
+                _period = 1 / freq;
                 _time = 0;
             }
 
@@ -49,23 +49,17 @@ namespace hf {
 
             virtual void doTask(void) = 0;
 
-            virtual bool specific_conditions(void) = 0;
-
         public:
-
-            float period = 0;
 
             void update(void)
             {
-                if (specific_conditions() && basic_conditions())
+                float time = _board->getTime();
+
+                if ((time - _time) > _period)
                 {
                     doTask();
+                    _time = time;
                 }
-            }
-
-            bool basic_conditions(void){
-                float time = _board->getTime();
-                return time - _time > period && _enabled;
             }
 
     };  // TimerTask

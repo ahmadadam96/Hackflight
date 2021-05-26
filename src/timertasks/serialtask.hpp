@@ -74,10 +74,6 @@ namespace hf {
                 printTaskTime("serial task", false);
             }
 
-            virtual bool specific_conditions(void) override
-            {
-            }
-
             // MspParser overrides -------------------------------------------------------
 
             virtual void handle_STATE_Request(float & altitude, float & variometer, float & positionX, float & positionY, 

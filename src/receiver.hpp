@@ -22,40 +22,25 @@
 
 #include <stdint.h>
 #include <math.h>
-#include "timertask.hpp"
-#include "mixer.hpp"
-#include "board.hpp"
 
 #include "datatypes.hpp"
 #include "loggingfunctions.hpp"
 
 namespace hf {
 
-    class Receiver : public TimerTask {
+    class Receiver {
 
         friend class Hackflight;
         friend class SerialTask;
         friend class PidTask;
-        friend class Board;
 
         private: 
-            static constexpr float FREQ = 300;
-            static constexpr float MAX_ARMING_ANGLE_DEGREES = 25.0f;
 
             const float THROTTLE_MARGIN = 0.1f;
             const float CYCLIC_EXPO     = 0.65f;
             const float CYCLIC_RATE     = 0.90f;
             const float THROTTLE_EXPO   = 0.20f;
             const float AUX_THRESHOLD   = 0.4f;
-
-            Mixer* _mixer = NULL;
-            state_t* _state = NULL;
-
-            // Support for headless mode
-            float _yawInitial = 0;
-
-            // Safety
-            bool _safeToArm = false;
 
             float adjustCommand(float command, uint8_t channel)
             {
@@ -90,11 +75,6 @@ namespace hf {
                 float tmp = (x + 1) / 2 - mid;
                 float y = tmp>0 ? 1-mid : (tmp<0 ? mid : 1);
                 return (mid + tmp*(1-THROTTLE_EXPO + THROTTLE_EXPO * (tmp*tmp) / (y*y))) * 2 - 1;
-            }
-
-            bool safeAngle(uint8_t axis)
-            {
-                return fabs(_state->rotation[axis]) < Filter::deg2rad(MAX_ARMING_ANGLE_DEGREES);
             }
 
         protected: 
@@ -150,7 +130,7 @@ namespace hf {
             /**
               * channelMap: throttle, roll, pitch, yaw, aux, arm
               */
-            Receiver(const uint8_t channelMap[6], float demandScale=1.0) : TimerTask(FREQ)
+            Receiver(const uint8_t channelMap[6], float demandScale=1.0) 
             { 
                 for (uint8_t k=0; k<6; ++k) {
                     _channelMap[k] = channelMap[k];
@@ -163,69 +143,12 @@ namespace hf {
                 _demandScale = demandScale;
             }
 
-            void init(Board* board, state_t* state, Mixer* mixer)
+            bool getDemands(float yawAngle)
             {
-                TimerTask::init(board);
-                _state = state;
-                _mixer = mixer;
-            }
-
-            virtual void doTask(void) override
-            {
-                // Check whether receiver data is available
-                printTaskTime("receiver task", true);
-                if(!getDemands(_state->rotation[AXIS_YAW] - _yawInitial)) return;
-
-                // Disarm
-                if (_state->armed && !getAux1State()) {
-                    _state->armed = false;
-                }
-
-                // Avoid arming if aux1 switch down on startup
-                if (!_safeToArm) {
-                    _safeToArm = !getAux1State();
-                }
-
-                // Arm (after lots of safety checks!)
-                if (_safeToArm && !_state->armed && throttleIsDown() && getAux1State() &&
-                    !_state->failsafe && safeAngle(AXIS_ROLL) && safeAngle(AXIS_PITCH)) {
-                    _state->armed = true;
-                    _yawInitial = _state->rotation[AXIS_YAW];  // grab yaw for headless mode
-                }
-
-                // Cut motors on throttle-down
-                if (_state->armed && throttleIsDown()) {
-                    _mixer->cut();
-                }
-
-                // Set LED based on arming status
-                _board->showArmedStatus(_state->armed);
-
-                printTaskTime("receiver task", false);
-            }
-
-            virtual bool specific_conditions(void) override
-            {
-                if(!basic_conditions()) return false;
-                
-                // Sync failsafe to receiver
-                if (lostSignal() && _state->armed) {
-                    _mixer->cut();
-                    _state->armed = false;
-                    _state->failsafe = true;
-                    _board->showArmedStatus(false);
-                    return false;
-                }
-
                 // Wait till there's a new frame
                 if (!gotNewFrame()) return false;
 
-                return true;
-            }  // checkReceiver
-
-            bool getDemands(float yawAngle)
-            {
-
+                printTaskTime("receiver task", true);
                 // Read raw channel values
                 readRawvals();
 
