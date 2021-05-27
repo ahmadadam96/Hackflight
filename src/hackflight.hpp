@@ -76,50 +76,19 @@ namespace hf {
                 return fabs(_state.rotation[axis]) < Filter::deg2rad(MAX_ARMING_ANGLE_DEGREES);
             }
 
-           void checkQuaternion(void)
-            {
-                // Some quaternion filters may need to know the current time
-                float time = _board->getTime();
-
-                // If quaternion data ready
-                if (_quaternion.ready(time)) {
-
-                    printTaskTime("quaternion sensor task", true);
-                    // Update state with new quaternion to yield Euler angles
-                    _quaternion.modifyState(_state, time);
-                    printTaskTime("quaternion sensor task", false);
-                }
-            }
-
-            void checkGyrometer(void)
-            {
-                // Some gyrometers may need to know the current time
-                float time = _board->getTime();
-
-                // If gyrometer data ready
-                if (_gyrometer.ready(time)) {
-
-                    printTaskTime("gyrometer sensor task", true);
-                    // Update state with gyro rates
-                    _gyrometer.modifyState(_state, time);
-                    printTaskTime("gyrometer sensor task", false);
-                }
-            }
-
-
             Board    * _board    = NULL;
             Receiver * _receiver = NULL;
 
             // Vehicle state
             state_t _state;
 
-            void checkOptionalSensors(void)
+            void checkSensors(void)
             {
                 for (uint8_t k=0; k<_sensor_count; ++k) {
                     Sensor * sensor = _sensors[k];
                     float time = _board->getTime();
                     if (sensor->ready(time)) {
-                        String sensor_number = "optional sensor number " + String(k, DEC) + " task"; 
+                        String sensor_number = "sensor number " + String(k, DEC) + " task"; 
                         printTaskTime(sensor_number, true);
                         sensor->modifyState(_state, time);
                         printTaskTime(sensor_number, false);
@@ -257,12 +226,8 @@ namespace hf {
                 // Update PID controllers task
                 _pidTask.update();
 
-                // Check mandatory sensors
-                checkGyrometer();
-                checkQuaternion();
-
-                // Check optional sensors
-                checkOptionalSensors();
+                // Check sensors
+                checkSensors();
 
                 // Update serial comms task
                 _serialTask.update();
