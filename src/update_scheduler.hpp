@@ -21,6 +21,8 @@
 #pragma once
 
 #include "loggingfunctions.hpp"
+#include <vector>
+#include <limits.h>
 
 namespace hf
 {
@@ -28,17 +30,36 @@ namespace hf
     {
         friend class Hackflight;
 
-        // task order receiver, PID, sensor, serial
-        #define number_of_tasks
-
         struct task_info {
             int task_id;
             int time_task_ended;
             int period;
             int time_next_invocation;
         };
+        unsigned int number_of_tasks;
 
-        task_info task_infos[number_of_tasks];
+       public:
+        std::vector<task_info> task_infos;
+
+        // task id 0 receiver task
+        // task id 1 PID task
+        // task id 2 serial communication task
+        // task ids 3+ sensor tasks
+        UpdateScheduler(unsigned int sensor_count = 2)
+        {
+            number_of_tasks = sensor_count + 3;
+        }
+        
+        void update_period(int task_id, unsigned int period){
+            task_infos[task_id].period = period;
+        }
+
+        void task_completed(int task_id)
+        {
+            task_infos[task_id].time_task_ended = micros();
+            task_infos[task_id].time_next_invocation = task_infos[task_id].time_task_ended\
+                + task_infos[task_id].period;   
+        }
 
         unsigned int when_schedule_update(unsigned int update_time_required)
         {

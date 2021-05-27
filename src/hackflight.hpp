@@ -35,6 +35,7 @@
 #include "sensors/surfacemount/gyrometer.hpp"
 #include "sensors/surfacemount/quaternion.hpp"
 #include "loggingfunctions.hpp"
+#include "update_scheduler.hpp"
 
 namespace hf {
 
@@ -70,6 +71,9 @@ namespace hf {
              // Mandatory sensors on the board
             Gyrometer _gyrometer;
             Quaternion _quaternion; // not really a sensor, but we treat it like one!
+
+            // Update scheduler with the sensor count
+            UpdateScheduler _update_scheduler;
  
             bool safeAngle(uint8_t axis)
             {
@@ -91,6 +95,7 @@ namespace hf {
                         String sensor_number = "sensor number " + String(k, DEC) + " task"; 
                         printTaskTime(sensor_number, true);
                         sensor->modifyState(_state, time);
+                        _update_scheduler.task_completed(3+k);
                         printTaskTime(sensor_number, false);
                     }
                 }
@@ -131,7 +136,7 @@ namespace hf {
                 _state.failsafe = false;
 
                 // Initialize timer task for PID controllers
-                _pidTask.init(_board, _receiver, _mixer, &_state);
+                _pidTask.init(_board, _receiver, _mixer, &_state, &_update_scheduler);
             }
 
             void checkReceiver(void)
@@ -176,6 +181,7 @@ namespace hf {
                 // Set LED based on arming status
                 _board->showArmedStatus(_state.armed);
 
+                _update_scheduler.task_completed(0);
                 printTaskTime("receiver task", false);
             } // checkReceiver
 
@@ -191,7 +197,7 @@ namespace hf {
                 _mixer = mixer;
 
                 // Initialize serial timer task
-                _serialTask.init(board, &_state, receiver, mixer);
+                _serialTask.init(board, &_state, receiver, mixer, &_update_scheduler);
 
                 // Support safety override by simulator
                 _state.armed = armed;

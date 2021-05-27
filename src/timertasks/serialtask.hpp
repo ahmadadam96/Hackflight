@@ -26,6 +26,7 @@
 #include "debugger.hpp"
 #include "mixer.hpp"
 #include "loggingfunctions.hpp"
+#include "update_scheduler.hpp"
 
 namespace hf {
 
@@ -40,6 +41,8 @@ namespace hf {
             Mixer    * _mixer = NULL;
             Receiver * _receiver = NULL;
             state_t  * _state = NULL;
+            UpdateScheduler *_update_scheduler = NULL;
+
 
             void _init(Board * board, state_t * state, Receiver * receiver) 
             {
@@ -72,6 +75,7 @@ namespace hf {
                     _mixer->runDisarmed();
                 }
                 printTaskTime("serial task", false);
+                _update_scheduler->task_completed(2);
             }
 
             // MspParser overrides -------------------------------------------------------
@@ -131,12 +135,13 @@ namespace hf {
             {
             }
 
-            void init(Board * board, state_t * state, Receiver * receiver, Mixer * mixer) 
+            void init(Board *board, state_t *state, Receiver *receiver, Mixer *mixer, UpdateScheduler *update_scheduler)
             {
                 TimerTask::init(board);
                 _state = state;
                 _receiver = receiver;
                 _mixer = mixer;
+                _update_scheduler = update_scheduler;
             }
 
     };  // SerialTask

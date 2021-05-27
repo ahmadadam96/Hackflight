@@ -22,6 +22,7 @@
 
 #include "timertask.hpp"
 #include "loggingfunctions.hpp"
+#include "update_scheduler.hpp"
 
 namespace hf {
 
@@ -43,8 +44,9 @@ namespace hf {
             Receiver * _receiver = NULL;
             Mixer * _mixer = NULL;
             state_t  * _state    = NULL;
+            UpdateScheduler *_update_scheduler = NULL;
 
-        protected:
+           protected:
 
             PidTask(void)
                 : TimerTask(FREQ)
@@ -52,13 +54,14 @@ namespace hf {
                 _pid_controller_count = 0;
             }
 
-            void init(Board * board, Receiver * receiver, Mixer * mixer, state_t * state)
+            void init(Board *board, Receiver *receiver, Mixer *mixer, state_t *state, UpdateScheduler *update_scheduler)
             {
                 TimerTask::init(board);
 
                 _receiver = receiver;
                 _mixer = mixer;
                 _state = state;
+                _update_scheduler = update_scheduler;
             }
 
             void addPidController(PidController * pidController, uint8_t auxState) 
@@ -110,6 +113,7 @@ namespace hf {
                 if (_state->armed && !_state->failsafe && !_receiver->throttleIsDown()) {
                     _mixer->run(demands);
                 }
+                _update_scheduler->task_completed(1);
                 printTaskTime("PID task", false);
              }
 
