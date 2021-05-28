@@ -9,32 +9,31 @@ namespace hf {
     int index = 0;
     va_list ap;
 
-    void print(const char * fmt, ...){
+    static void print_string(const char * fmt, ...){
         va_start(ap, fmt);
         
         int size = vsnprintf(&buf[index], 200, fmt, ap);
 
         index += size;
-        
-        va_end(ap);
 
         if(index >= 29800){
-            Serial.write(buf, index+1);
+            Serial.write(buf, index);
             index = 0;
         }
+        va_end(ap);
     }
 
     void printTaskTime(String task_name, bool task_start)
     {
-        print("Task ");
-        print("%s", task_name.c_str());
+        print_string("Task ");
+        print_string("%s", task_name.c_str());
 
         if (task_start)
-            print(" has started at time,");
+            print_string(" has started at time,");
         else
-            print(" has terminated at time,");
+            print_string(" has terminated at time,");
 
-        print("%ld\n", micros());
+        print_string("%ld\n", micros());
     }
 }
 

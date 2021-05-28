@@ -62,6 +62,7 @@ namespace hf {
                 _mixer = mixer;
                 _state = state;
                 _update_scheduler = update_scheduler;
+                _update_scheduler->update_period(1, 1000000/FREQ);
             }
 
             void addPidController(PidController * pidController, uint8_t auxState) 

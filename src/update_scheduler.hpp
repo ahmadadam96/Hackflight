@@ -23,7 +23,6 @@
 #include "loggingfunctions.hpp"
 #include <vector>
 #include <limits.h>
-
 namespace hf
 {
     class UpdateScheduler
@@ -31,12 +30,14 @@ namespace hf
         friend class Hackflight;
 
         struct task_info {
-            int task_id;
-            int time_task_ended;
-            int period;
-            int time_next_invocation;
+            int task_id = 10;
+            int time_task_ended = 0;
+            int period = 0;
+            int time_next_invocation = 0;
         };
         unsigned int number_of_tasks;
+
+        bool update_scheduled = false;
 
        public:
         std::vector<task_info> task_infos;
@@ -48,6 +49,9 @@ namespace hf
         UpdateScheduler(unsigned int sensor_count = 2)
         {
             number_of_tasks = sensor_count + 3;
+            for(int i = 0; i< number_of_tasks; i++){
+                task_infos.push_back(task_info());
+            }
         }
         
         void update_period(int task_id, unsigned int period){
@@ -59,6 +63,7 @@ namespace hf
             task_infos[task_id].time_task_ended = micros();
             task_infos[task_id].time_next_invocation = task_infos[task_id].time_task_ended\
                 + task_infos[task_id].period;   
+            if(!update_scheduled) when_schedule_update(1520);
         }
 
         unsigned int when_schedule_update(unsigned int update_time_required)
@@ -72,11 +77,19 @@ namespace hf
                 }
             }
             unsigned int current_time = micros();
+            print_string("Minimum value ,%d, current time ,%d\n", min_value, current_time);
 
-            if (min_value - current_time < update_time_required)
-                return micros();
-            else
+            if (min_value > current_time && min_value - current_time > update_time_required)
+            {
+                print_string("Update of size ,%d scheduled at time ,%d\n", update_time_required, current_time);
+                update_scheduled = true;
+                return current_time;
+            }
+
+            else{
+                print_string("Update scheduling failed\n");
                 return 0;
+            }
         }
 
     };  // SerialTask
