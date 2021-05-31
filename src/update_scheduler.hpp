@@ -30,11 +30,11 @@ namespace hf
         friend class Hackflight;
 
         struct task_info {
-            int task_id = 10;
             int time_task_ended = 0;
             int period = 0;
             int time_next_invocation = 0;
         };
+        unsigned int update_time_required;
         unsigned int number_of_tasks;
 
         bool update_scheduled = false;
@@ -46,15 +46,16 @@ namespace hf
         // task id 1 PID task
         // task id 2 serial communication task
         // task ids 3+ sensor tasks
-        UpdateScheduler(unsigned int sensor_count = 2)
+        UpdateScheduler(unsigned int sensor_count = 2, unsigned int update_time_required = 1520)
         {
             number_of_tasks = sensor_count + 3;
+            hf::UpdateScheduler::update_time_required = update_time_required;
             for(int i = 0; i< number_of_tasks; i++){
                 task_infos.push_back(task_info());
             }
         }
         
-        void update_period(int task_id, unsigned int period){
+        void set_task_period(int task_id, unsigned int period){
             task_infos[task_id].period = period;
         }
 
@@ -63,7 +64,7 @@ namespace hf
             task_infos[task_id].time_task_ended = micros();
             task_infos[task_id].time_next_invocation = task_infos[task_id].time_task_ended\
                 + task_infos[task_id].period;   
-            if(!update_scheduled) when_schedule_update(1520);
+            if(!update_scheduled) when_schedule_update(update_time_required);
         }
 
         unsigned int when_schedule_update(unsigned int update_time_required)

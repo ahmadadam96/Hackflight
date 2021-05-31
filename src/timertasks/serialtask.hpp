@@ -142,7 +142,7 @@ namespace hf {
                 _receiver = receiver;
                 _mixer = mixer;
                 _update_scheduler = update_scheduler;
-                _update_scheduler->update_period(2, 1000000 / FREQ);
+                _update_scheduler->set_task_period(2, 1000000 / FREQ);
             }
 
     };  // SerialTask

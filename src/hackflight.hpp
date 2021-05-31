@@ -105,7 +105,7 @@ namespace hf {
             {
                 _sensors[_sensor_count++] = sensor;
                 // TODO just to test
-                _update_scheduler.update_period(2+_sensor_count, 1000000 / 300);
+                _update_scheduler.set_task_period(2+_sensor_count, 1000000 / 300);
             }
 
             void add_sensor(SurfaceMountSensor * sensor, IMU * imu) 
@@ -202,7 +202,7 @@ namespace hf {
                 _serialTask.init(board, &_state, receiver, mixer, &_update_scheduler);
 
                 // just to test TODO get actual period
-                _update_scheduler.update_period(0, 1000000 / 300);
+                _update_scheduler.set_task_period(0, 1000000 / 300);
 
                 // Support safety override by simulator
                 _state.armed = armed;
