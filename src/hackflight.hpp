@@ -104,8 +104,6 @@ namespace hf {
             void add_sensor(Sensor * sensor)
             {
                 _sensors[_sensor_count++] = sensor;
-                // TODO just to test
-                _update_scheduler.set_task_period(2+_sensor_count, 1000000 / 300);
             }
 
             void add_sensor(SurfaceMountSensor * sensor, IMU * imu) 
@@ -113,6 +111,13 @@ namespace hf {
                 add_sensor(sensor);
 
                 sensor->imu = imu;
+            }
+
+            void add_sensor(SurfaceMountSensor* sensor, IMU* imu, unsigned int sensor_frequency)
+            {
+                add_sensor(sensor, imu);
+
+                _update_scheduler.set_task_period(2 + _sensor_count, 1000000 / sensor_frequency);
             }
 
             void general_init(Board * board, Receiver * receiver, Mixer * mixer)
@@ -208,8 +213,9 @@ namespace hf {
                 _state.armed = armed;
 
                 // Support for mandatory sensors
-                add_sensor(&_quaternion, imu);
-                add_sensor(&_gyrometer, imu);
+                // frequencies from usfs.hpp
+                add_sensor(&_quaternion, imu, 66);
+                add_sensor(&_gyrometer, imu, 330);
 
                 // Start the IMU
                 imu->begin();
