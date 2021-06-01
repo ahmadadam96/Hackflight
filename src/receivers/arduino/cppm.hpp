@@ -39,10 +39,12 @@ namespace hf {
             void begin(void)
             {
                 rx->begin();
+                receiver_running = true;
             }
 
             bool gotNewFrame(void)
             {
+                if(!receiver_running) return false;
                 return rx->gotNewFrame();
             }
 
@@ -65,6 +67,8 @@ namespace hf {
 
         public:
 
+            bool receiver_running = false;
+
             CPPM_Receiver(uint8_t pin, const uint8_t channelMap[6], const float demandScale) 
                 : Receiver(channelMap, demandScale) 
             { 
@@ -73,10 +77,12 @@ namespace hf {
 
             void pause(){
                 rx->pause();
+                receiver_running = false;
             }
 
             void resume(){
                 rx->resume();
+                receiver_running = true;
             }
 
     }; // class CPPM_Receiver
