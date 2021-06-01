@@ -71,6 +71,14 @@ namespace hf {
                 rx = new CPPMRX(pin, 6);
             }
 
+            void pause(){
+                rx->pause();
+            }
+
+            void resume(){
+                rx->resume();
+            }
+
     }; // class CPPM_Receiver
 
 } // namespace hf
