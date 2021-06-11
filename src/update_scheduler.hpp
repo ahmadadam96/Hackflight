@@ -93,6 +93,17 @@ namespace hf
             }
         }
 
-    };  // SerialTask
+        void take_actions()
+        {
+            /*
+            What sort of actions to take?
+            1. Disable the receiver
+            2. Switch serial task to dynamic frequency
+            3. Turn on reactive control
+            4. Use real-time calculus frequencies for sensors
+            */
+        }
+    }; 
+
 
 }  // namespace hf

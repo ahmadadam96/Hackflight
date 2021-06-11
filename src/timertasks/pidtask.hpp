@@ -34,7 +34,7 @@ namespace hf {
 
             // For now, we keep all PID timer tasks the same.  At some point it might be useful to 
             // investigate, e.g., faster updates for Rate PID than for Level PID.
-            static constexpr float FREQ = 300;
+            float FREQ = 300;
 
             // PID controllers
             PidController * _pid_controllers[256] = {NULL};

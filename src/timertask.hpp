@@ -62,6 +62,10 @@ namespace hf {
                 }
             }
 
+            void change_frequency(float freq){
+                _period = 1 / freq;
+            }
+
     };  // TimerTask
 
 } // namespace hf
