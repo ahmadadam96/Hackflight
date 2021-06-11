@@ -36,6 +36,7 @@ Copyright (c) 2018 Simon D. Levy
 #include "mixers/quadxcf.hpp"
 #include "pidcontrollers/rate.hpp"
 #include "pidcontrollers/level.hpp"
+#include "pidcontrollers/althold.hpp"
 #include "debugger.hpp"
 
 // throttle, roll, pitch, yaw, aux, arm 
@@ -52,6 +53,12 @@ hf::RatePid ratePid = hf::RatePid(0.225, 0.001875, 0.375, 1.0625, 0.005625f);
 
 hf::LevelPid levelPid = hf::LevelPid(0.20f);
 
+hf::AltitudeHoldPid altholdPid = hf::AltitudeHoldPid(
+    1.00f,   // Altitude Hold P
+    0.15f,   // Altitude Hold Velocity P
+    0.01f,   // Altitude Hold Velocity I
+    0.05f);  // Altitude Hold Velocity D
+
 void setup(void)
 {
     delay(3000);
@@ -63,6 +70,7 @@ void setup(void)
     // Add PID controllers
     h.addPidController(&levelPid);
     h.addPidController(&ratePid);
+    h.addPidController(&altholdPid, 1);
 }
 
 void loop(void)

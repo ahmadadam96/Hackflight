@@ -78,6 +78,11 @@ namespace hf {
             void pause(){
                 rx->pause();
                 receiver_running = false;
+                // when we pause receiver. We want to give it values to keep the drone still
+                demands.pitch = 0;
+                demands.roll = 0;
+                demands.throttle = 0;
+                demands.yaw = 0;
             }
 
             void resume(){
