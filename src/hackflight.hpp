@@ -72,9 +72,6 @@ namespace hf {
             Gyrometer _gyrometer;
             Quaternion _quaternion; // not really a sensor, but we treat it like one!
 
-            // Update scheduler with the sensor count
-            UpdateScheduler _update_scheduler;
- 
             bool safeAngle(uint8_t axis)
             {
                 return fabs(_state.rotation[axis]) < Filter::deg2rad(MAX_ARMING_ANGLE_DEGREES);
@@ -82,6 +79,9 @@ namespace hf {
 
             Board    * _board    = NULL;
             Receiver * _receiver = NULL;
+
+            // Update scheduler with the sensor count
+            UpdateScheduler _update_scheduler;
 
             // Vehicle state
             state_t _state;
@@ -95,8 +95,8 @@ namespace hf {
                         String sensor_number = "sensor number " + String(k, DEC) + " task"; 
                         printTaskTime(sensor_number, true);
                         sensor->modifyState(_state, time);
-                        _update_scheduler.task_completed(3+k);
                         printTaskTime(sensor_number, false);
+                        _update_scheduler.task_completed(2 + k);
                     }
                 }
             }
@@ -117,11 +117,12 @@ namespace hf {
             {
                 add_sensor(sensor, imu);
 
-                _update_scheduler.set_task_period(2 + _sensor_count, 1000000 / sensor_frequency);
+                _update_scheduler.set_task_period(1 + _sensor_count, 1000000 / sensor_frequency);
             }
 
             void general_init(Board * board, Receiver * receiver, Mixer * mixer)
             {  
+
                 // Store the essentials
                 _board    = board;
                 _receiver = receiver;
@@ -141,6 +142,8 @@ namespace hf {
 
                 // Setup failsafe
                 _state.failsafe = false;
+
+                _update_scheduler.init(2, 1520, _receiver);
 
                 // Initialize timer task for PID controllers
                 _pidTask.init(_board, _receiver, _mixer, &_state, &_update_scheduler);
@@ -188,7 +191,6 @@ namespace hf {
                 // Set LED based on arming status
                 _board->showArmedStatus(_state.armed);
 
-                _update_scheduler.task_completed(0);
                 printTaskTime("receiver task", false);
             } // checkReceiver
 
@@ -205,9 +207,6 @@ namespace hf {
 
                 // Initialize serial timer task
                 _serialTask.init(board, &_state, receiver, mixer, &_update_scheduler);
-
-                // just to test TODO get actual period
-                _update_scheduler.set_task_period(0, 1000000 / 300);
 
                 // Support safety override by simulator
                 _state.armed = armed;
@@ -237,6 +236,12 @@ namespace hf {
 
             void update(void)
             {
+                static unsigned int count = 0;
+                if(millis() > 8000 && count == 0){
+                    _update_scheduler.initialize_scheduling(2000);
+                    count++;
+                }
+
                 // Grab control signal if available
                 checkReceiver();
 

@@ -75,7 +75,7 @@ namespace hf {
                     _mixer->runDisarmed();
                 }
                 printTaskTime("serial task", false);
-                _update_scheduler->task_completed(2);
+                _update_scheduler->task_completed(1);
             }
 
             // MspParser overrides -------------------------------------------------------
@@ -142,7 +142,7 @@ namespace hf {
                 _receiver = receiver;
                 _mixer = mixer;
                 _update_scheduler = update_scheduler;
-                _update_scheduler->set_task_period(2, 1000000 / FREQ);
+                _update_scheduler->set_task_period(1, 1000000 / FREQ);
             }
 
     };  // SerialTask

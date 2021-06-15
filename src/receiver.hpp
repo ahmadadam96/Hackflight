@@ -211,12 +211,14 @@ namespace hf {
                 return _aux2State;
             }
 
-        public:
+           public:
 
             void setTrimRoll(float trim)
             {
                 _trimRoll = trim;
             }
+
+
 
             void setTrimPitch(float trim)
             {
@@ -227,6 +229,10 @@ namespace hf {
             {
                 _trimYaw = trim;
             }
+
+            virtual void resume(void) = 0;
+
+            virtual void pause(void) = 0;
 
     }; // class Receiver
 

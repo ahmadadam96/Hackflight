@@ -30,32 +30,36 @@ namespace hf
         friend class Hackflight;
 
         struct task_info {
-            int time_task_ended = 0;
-            int period = 0;
-            int time_next_invocation = 0;
+            unsigned int time_task_ended = 0;
+            unsigned int period = 0;
+            unsigned int time_next_invocation = 0;
         };
         unsigned int update_time_required;
         unsigned int number_of_tasks;
 
-        bool update_scheduled = false;
+        bool update_scheduled = true;
+
+        Receiver* _receiver = NULL;
 
        public:
         std::vector<task_info> task_infos;
 
-        // task id 0 receiver task
-        // task id 1 PID task
-        // task id 2 serial communication task
-        // task ids 3+ sensor tasks
-        UpdateScheduler(unsigned int sensor_count = 2, unsigned int update_time_required = 1520)
-        {
-            number_of_tasks = sensor_count + 3;
+        // receiver task gets disabled when updating
+        // task id 0 PID task
+        // task id 1 serial communication task
+        // task ids 2+ sensor tasks
+
+        void init(unsigned int sensor_count, unsigned int update_time_required, Receiver* receiver){
+            number_of_tasks = sensor_count + 2;
+            hf::UpdateScheduler::_receiver = receiver;
             hf::UpdateScheduler::update_time_required = update_time_required;
-            for(int i = 0; i< number_of_tasks; i++){
+            for (int i = 0; i < number_of_tasks; i++) {
                 task_infos.push_back(task_info());
             }
         }
-        
-        void set_task_period(int task_id, unsigned int period){
+
+            void set_task_period(int task_id, unsigned int period)
+        {
             task_infos[task_id].period = period;
         }
 
@@ -67,23 +71,31 @@ namespace hf
             if(!update_scheduled) when_schedule_update(update_time_required);
         }
 
+        void initialize_scheduling(unsigned int update_time_required){
+            hf::UpdateScheduler::update_time_required = update_time_required;
+            update_scheduled = false;
+        }
+
         unsigned int when_schedule_update(unsigned int update_time_required)
         {
             unsigned int min_value = UINT_MAX;
             unsigned int min_index;
             for (unsigned int i = 0; i < number_of_tasks; i++) {
+                print_string("Index ,%d, value time ,%d\n", i, task_infos[i].time_next_invocation);
                 if (task_infos[i].time_next_invocation < min_value) {
                     min_value = task_infos[i].time_next_invocation;
                     min_index = i;
                 }
             }
             unsigned int current_time = micros();
-            print_string("Minimum value ,%d, current time ,%d\n", min_value, current_time);
 
             if (min_value > current_time && min_value - current_time > update_time_required)
             {
+                _receiver->pause();
+                // perform update here
                 print_string("Update of size ,%d scheduled at time ,%d\n", update_time_required, current_time);
                 update_scheduled = true;
+                _receiver->resume();
                 return current_time;
             }
 

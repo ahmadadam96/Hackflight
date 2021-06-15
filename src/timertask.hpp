@@ -27,14 +27,13 @@ namespace hf {
 
     class TimerTask {
 
-        private:
-
-            float _period = 0;
-            float _time = 0;
-
         protected:
 
             Board * _board = NULL;
+
+            float _time = 0;
+
+            float _period = 0;
 
             TimerTask(float freq)
             {

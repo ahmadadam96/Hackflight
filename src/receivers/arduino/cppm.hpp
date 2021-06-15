@@ -75,7 +75,8 @@ namespace hf {
                 rx = new CPPMRX(pin, 6);
             }
 
-            void pause(){
+            void pause(void)
+            {
                 rx->pause();
                 receiver_running = false;
                 // when we pause receiver. We want to give it values to keep the drone still
@@ -85,7 +86,8 @@ namespace hf {
                 demands.yaw = 0;
             }
 
-            void resume(){
+            void resume(void)
+            {
                 rx->resume();
                 receiver_running = true;
             }
