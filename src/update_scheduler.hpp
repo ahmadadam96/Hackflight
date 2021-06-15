@@ -48,6 +48,7 @@ namespace hf
         // task id 0 PID task
         // task id 1 serial communication task
         // task ids 2+ sensor tasks
+        // receiver task has id 1000 just for debugging
 
         void init(unsigned int sensor_count, unsigned int update_time_required, Receiver* receiver){
             number_of_tasks = sensor_count + 2;
@@ -81,7 +82,7 @@ namespace hf
             unsigned int min_value = UINT_MAX;
             unsigned int min_index;
             for (unsigned int i = 0; i < number_of_tasks; i++) {
-                print_string("Index ,%d, value time ,%d\n", i, task_infos[i].time_next_invocation);
+                print_string("Task index,%d,Next invocation time,%d\n", i, task_infos[i].time_next_invocation);
                 if (task_infos[i].time_next_invocation < min_value) {
                     min_value = task_infos[i].time_next_invocation;
                     min_index = i;
@@ -93,7 +94,7 @@ namespace hf
             {
                 _receiver->pause();
                 // perform update here
-                print_string("Update of size ,%d scheduled at time ,%d\n", update_time_required, current_time);
+                print_string("Update of size,%d,scheduled at time,%d\n", update_time_required, current_time);
                 update_scheduled = true;
                 _receiver->resume();
                 return current_time;

@@ -36,7 +36,9 @@ namespace hf {
 
         private:
 
-            static constexpr float FREQ = 66;
+            float FREQ = 66;
+
+            static constexpr unsigned int task_id = 1;
 
             Mixer    * _mixer = NULL;
             Receiver * _receiver = NULL;
@@ -60,7 +62,7 @@ namespace hf {
 
             virtual void doTask(void) override
             {
-                printTaskTime("serial task", true);
+                printTaskTime(task_id, true);
                 while (_board->serialAvailableBytes() > 0) {
 
                     MspParser::parse(_board->serialReadByte());
@@ -74,8 +76,8 @@ namespace hf {
                 if (!_state->armed) {
                     _mixer->runDisarmed();
                 }
-                printTaskTime("serial task", false);
-                _update_scheduler->task_completed(1);
+                printTaskTime(task_id, false);
+                _update_scheduler->task_completed(task_id);
             }
 
             // MspParser overrides -------------------------------------------------------
@@ -137,6 +139,7 @@ namespace hf {
 
             void init(Board *board, state_t *state, Receiver *receiver, Mixer *mixer, UpdateScheduler *update_scheduler)
             {
+                change_frequency(FREQ);
                 TimerTask::init(board);
                 _state = state;
                 _receiver = receiver;

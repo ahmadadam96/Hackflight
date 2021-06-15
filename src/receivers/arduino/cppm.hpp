@@ -78,6 +78,7 @@ namespace hf {
             void pause(void)
             {
                 rx->pause();
+                print_string("Task,%d,paused at time,%ld\n", 1000, micros());
                 receiver_running = false;
                 // when we pause receiver. We want to give it values to keep the drone still
                 demands.pitch = 0;
@@ -89,6 +90,7 @@ namespace hf {
             void resume(void)
             {
                 rx->resume();
+                print_string("Task,%d,resumed at time,%ld\n", 1000, micros());
                 receiver_running = true;
             }
 

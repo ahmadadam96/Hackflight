@@ -17,23 +17,20 @@ namespace hf {
         index += size;
 
         if(index >= 29800){
+            printf("Writing to serial started at,%d\n", micros());
             Serial.write(buf, index);
+            printf("Writing to serial completed at,%d\n", micros());
             index = 0;
         }
         va_end(ap);
     }
 
-    void printTaskTime(String task_name, bool task_start)
+    void printTaskTime(int task_id, bool task_start)
     {
-        print_string("Task ");
-        print_string("%s", task_name.c_str());
-
         if (task_start)
-            print_string(" has started at time,");
+            print_string("Task,%d,started at time,%ld\n", task_id, micros());
         else
-            print_string(" has terminated at time,");
-
-        print_string("%ld\n", micros());
+            print_string("Task,%d,terminated at time,%ld\n", task_id, micros());
     }
 }
 

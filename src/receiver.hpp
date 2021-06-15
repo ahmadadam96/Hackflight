@@ -148,7 +148,7 @@ namespace hf {
                 // Wait till there's a new frame
                 if (!gotNewFrame()) return false;
 
-                printTaskTime("receiver task", true);
+                printTaskTime(1000, true);
                 // Read raw channel values
                 readRawvals();
 

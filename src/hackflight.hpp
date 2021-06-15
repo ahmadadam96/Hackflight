@@ -92,11 +92,10 @@ namespace hf {
                     Sensor * sensor = _sensors[k];
                     float time = _board->getTime();
                     if (sensor->ready(time)) {
-                        String sensor_number = "sensor number " + String(k, DEC) + " task"; 
-                        printTaskTime(sensor_number, true);
+                        printTaskTime(k+2, true);
                         sensor->modifyState(_state, time);
-                        printTaskTime(sensor_number, false);
-                        _update_scheduler.task_completed(2 + k);
+                        printTaskTime(k+2, false);
+                        _update_scheduler.task_completed(k+2);
                     }
                 }
             }
@@ -191,7 +190,7 @@ namespace hf {
                 // Set LED based on arming status
                 _board->showArmedStatus(_state.armed);
 
-                printTaskTime("receiver task", false);
+                printTaskTime(1000, false);
             } // checkReceiver
 
         public:
@@ -237,7 +236,7 @@ namespace hf {
             void update(void)
             {
                 static unsigned int count = 0;
-                if(millis() > 8000 && count == 0){
+                if(millis() > 20000 && count == 0){
                     _update_scheduler.initialize_scheduling(2000);
                     count++;
                 }

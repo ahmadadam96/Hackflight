@@ -34,7 +34,9 @@ namespace hf {
 
             // For now, we keep all PID timer tasks the same.  At some point it might be useful to 
             // investigate, e.g., faster updates for Rate PID than for Level PID.
-            static constexpr float FREQ = 300;
+            float FREQ = 300;
+
+            static constexpr unsigned int task_id = 0;
 
             // PID controllers
             PidController * _pid_controllers[256] = {NULL};
@@ -60,6 +62,7 @@ namespace hf {
 
             void init(Board *board, Receiver *receiver, Mixer *mixer, state_t *state, UpdateScheduler *update_scheduler)
             {
+                change_frequency(FREQ);
                 TimerTask::init(board);
 
                 _receiver = receiver;
@@ -124,7 +127,7 @@ namespace hf {
 
             virtual void doTask(void) override
             {
-                printTaskTime("PID task", true);
+                printTaskTime(task_id, true);
                 // Start with demands from receiver, scaling roll/pitch/yaw by constant
                 demands_t demands = {};
                 demands.throttle = _receiver->demands.throttle;
@@ -164,8 +167,8 @@ namespace hf {
                 if (_state->armed && !_state->failsafe && !_receiver->throttleIsDown()) {
                     _mixer->run(demands);
                 }
-                printTaskTime("PID task", false);
-                _update_scheduler->task_completed(0);
+                printTaskTime(task_id, false);
+                _update_scheduler->task_completed(task_id);
              }
 
     };  // PidTask
